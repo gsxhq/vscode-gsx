@@ -6,6 +6,7 @@ describe('package.json manifest', () => {
     const langs = pkg.contributes?.languages ?? []
     const gsx = langs.find((l: any) => l.id === 'gsx')
     expect(gsx, 'a language with id "gsx"').toBeTruthy()
+    if (!gsx) return
     expect(gsx.extensions).toContain('.gsx')
     expect(gsx.configuration).toBe('./language-configuration.json')
   })
