@@ -1,0 +1,12 @@
+.github/
+test/
+src/
+syntaxes/*.src.yaml
+scripts/
+esbuild.mjs
+tsconfig.json
+**/*.map
+.gitignore
+.vscode-test/
+node_modules/
+!dist/
