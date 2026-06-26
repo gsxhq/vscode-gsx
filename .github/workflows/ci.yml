@@ -1,0 +1,35 @@
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request:
+permissions: { contents: read }
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with: { node-version: 24 }
+      - uses: actions/setup-go@v5
+        with: { go-version: '1.26.1' }
+      - run: npm ci
+      - name: Generate grammar + assert no drift
+        run: |
+          npm run gen:grammar
+          git diff --exit-code syntaxes/gsx.tmLanguage.json \
+            || (echo "::error::grammar JSON stale — run npm run gen:grammar and commit"; exit 1)
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test:grammar
+      - run: npm run test:unit
+      - name: Install gsx for the integration test
+        run: |
+          go install github.com/gsxhq/gsx/cmd/gsx@latest
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+      - name: Integration smoke (headless)
+        run: xvfb-run -a npm run test:integration
+        env: { GSX_ON_PATH: '1' }
+      - name: Package .vsix
+        run: npm run package
+      - uses: actions/upload-artifact@v4
+        with: { name: vsix, path: '*.vsix' }
