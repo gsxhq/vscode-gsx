@@ -18,6 +18,19 @@
         "extensions": [".gsx"],
         "configuration": "./language-configuration.json"
       }
+    ],
+    "grammars": [
+      {
+        "language": "gsx",
+        "scopeName": "source.gsx",
+        "path": "./syntaxes/gsx.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.go.gsx": "go",
+          "meta.embedded.line.go.gsx": "go",
+          "meta.embedded.block.js.gsx": "javascript",
+          "meta.embedded.block.css.gsx": "css"
+        }
+      }
     ]
   },
   "scripts": {
