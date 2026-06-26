@@ -66,8 +66,13 @@ async function startServer(): Promise<void> {
     outputChannel: output,
   }
   client = new LanguageClient('gsx', 'gsx language server', serverOptions, clientOptions)
-  await client.start()
-  output.appendLine(`gsx language server started: ${gsxPath} lsp`)
+  try {
+    await client.start()
+    output.appendLine(`gsx language server started: ${gsxPath} lsp`)
+  } catch (err) {
+    output.appendLine(`gsx language server failed to start: ${err}`)
+    client = undefined
+  }
 }
 
 async function installServer(): Promise<void> {
