@@ -46,9 +46,12 @@ async function buildResolveEnv(): Promise<ResolveEnv> {
 }
 
 async function startServer(): Promise<void> {
-  const gsxPath = resolveGsxPath(await buildResolveEnv())
+  const gsxPath = await resolveGsxPath(await buildResolveEnv())
   if (!gsxPath) {
-    output.appendLine('gsx binary not found on PATH/GOBIN/GOPATH/bin.')
+    output.appendLine(
+      'No gsx compiler found on PATH/GOBIN/GOPATH/bin. ' +
+        '(A binary named "gsx" that is not the gsx compiler — e.g. Ghostscript — is ignored.)',
+    )
     const pick = await vscode.window.showWarningMessage(
       'gsx language server not found. Install it to get diagnostics, navigation, and formatting.',
       'Install gsx',
