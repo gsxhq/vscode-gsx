@@ -9,6 +9,7 @@
   "icon": "icons/gsx.png",
   "engines": { "vscode": "^1.85.0" },
   "categories": ["Programming Languages"],
+  "activationEvents": ["onLanguage:gsx"],
   "main": "./dist/extension.js",
   "contributes": {
     "languages": [
@@ -31,6 +32,26 @@
           "meta.embedded.block.css.gsx": "css"
         }
       }
+    ],
+    "configuration": {
+      "title": "gsx",
+      "properties": {
+        "gsx.server.path": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute path to the gsx binary. Empty = auto-discover (PATH, GOBIN, GOPATH/bin)."
+        },
+        "gsx.trace.server": {
+          "type": "string",
+          "enum": ["off", "messages", "verbose"],
+          "default": "off",
+          "description": "Trace the communication between VS Code and the gsx language server."
+        }
+      }
+    },
+    "commands": [
+      { "command": "gsx.installServer", "title": "gsx: Install/Update Language Server" },
+      { "command": "gsx.restartServer", "title": "gsx: Restart Language Server" }
     ]
   },
   "scripts": {
@@ -41,16 +62,21 @@
     "lint": "eslint src --ext ts",
     "test:unit": "vitest run",
     "test:grammar": "vscode-tmgrammar-test -g test/grammar/stubs/go.tmLanguage.json -g test/grammar/stubs/javascript.tmLanguage.json -g test/grammar/stubs/css.tmLanguage.json \"test/grammar/**/*.gsx\"",
+    "test:integration": "tsc -p ./ --outDir out-test && node out-test/test/integration/runTest.js",
     "vscode:prepublish": "npm run gen:grammar && npm run compile",
     "package": "npm run gen:grammar && vsce package"
   },
   "devDependencies": {
+    "@types/mocha": "^10.0.0",
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.85.0",
+    "@vscode/test-electron": "^2.4.0",
     "@vscode/vsce": "^3.0.0",
     "esbuild": "^0.23.0",
     "eslint": "^9.0.0",
+    "glob": "^11.0.0",
     "js-yaml": "^4.1.0",
+    "mocha": "^10.0.0",
     "ovsx": "^0.9.0",
     "typescript": "^5.5.0",
     "vitest": "^2.0.0",
