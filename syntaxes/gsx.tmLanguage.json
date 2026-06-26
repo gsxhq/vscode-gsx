@@ -139,7 +139,12 @@
           "name": "punctuation.section.embedded.end.gsx"
         }
       },
-      "contentName": "source.go"
+      "contentName": "source.go",
+      "patterns": [
+        {
+          "include": "source.go"
+        }
+      ]
     },
     "doctype": {
       "name": "meta.tag.doctype.gsx",

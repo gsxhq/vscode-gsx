@@ -40,7 +40,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext ts",
     "test:unit": "vitest run",
-    "test:grammar": "vscode-tmgrammar-test \"test/grammar/**/*.gsx\"",
+    "test:grammar": "vscode-tmgrammar-test -g test/grammar/stubs/go.tmLanguage.json -g test/grammar/stubs/javascript.tmLanguage.json -g test/grammar/stubs/css.tmLanguage.json \"test/grammar/**/*.gsx\"",
     "vscode:prepublish": "npm run gen:grammar && npm run compile",
     "package": "npm run gen:grammar && vsce package"
   },

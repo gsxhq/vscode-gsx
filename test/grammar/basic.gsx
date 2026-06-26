@@ -11,5 +11,7 @@ component Card(title string) {
 //     ^ entity.name.type.component.gsx
     { title }
 //  ^ punctuation.section.embedded.begin.gsx
+    @{ title }
+//  ^ punctuation.section.embedded.begin.gsx
   </div>
 }

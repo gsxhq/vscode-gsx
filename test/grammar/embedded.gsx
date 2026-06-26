@@ -7,6 +7,7 @@ component Page() {
   .a { color: red }
   </style>
   <script>
+//   ^ entity.name.tag.gsx
   const x = 1
   </script>
 }
