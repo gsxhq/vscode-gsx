@@ -334,7 +334,7 @@
           "name": "punctuation.definition.string.begin.gsx"
         }
       },
-      "end": "`",
+      "end": "(?<!\\\\)(?:\\\\\\\\)*\\K`",
       "endCaptures": {
         "0": {
           "name": "punctuation.definition.string.end.gsx"
@@ -361,7 +361,7 @@
           "name": "punctuation.definition.string.begin.gsx"
         }
       },
-      "end": "`",
+      "end": "(?<!\\\\)(?:\\\\\\\\)*\\K`",
       "endCaptures": {
         "0": {
           "name": "punctuation.definition.string.end.gsx"
@@ -397,7 +397,7 @@
           "name": "punctuation.definition.string.begin.gsx"
         }
       },
-      "end": "(`)(\\})?",
+      "end": "((?<!\\\\)(?:\\\\\\\\)*\\K`)(\\})?",
       "endCaptures": {
         "1": {
           "name": "punctuation.definition.string.end.gsx"
@@ -436,7 +436,7 @@
           "name": "punctuation.definition.string.begin.gsx"
         }
       },
-      "end": "(`)(\\})?",
+      "end": "((?<!\\\\)(?:\\\\\\\\)*\\K`)(\\})?",
       "endCaptures": {
         "1": {
           "name": "punctuation.definition.string.end.gsx"

@@ -15,6 +15,10 @@ component Page() {
 //                                       ^ punctuation.section.embedded.begin.gsx
 //                                        ^ meta.embedded.block.css.gsx
 //                                                  ^ punctuation.section.embedded.begin.gsx
+  <button @click=js`save(\`hi @{id}\`)`/>
+//                         ^ meta.embedded.block.js.gsx
+//                            ^ punctuation.section.embedded.begin.gsx
+//                                    ^ punctuation.definition.string.end.gsx
   <style>
 //   ^ entity.name.tag.gsx
   .a { color: red }

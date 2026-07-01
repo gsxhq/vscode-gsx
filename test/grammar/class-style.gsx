@@ -18,6 +18,11 @@ component Card(x string) {
 //                                ^ meta.embedded.block.css.gsx
 //                                          ^ punctuation.section.embedded.begin.gsx
 //                                                    ^ punctuation.section.embedded.end.gsx
+    <span style={ "hidden": true, css`content:"\`";color:@{color}` }>
+//                                ^ meta.embedded.block.css.gsx
+//                                            ^ meta.embedded.block.css.gsx
+//                                                       ^ punctuation.section.embedded.begin.gsx
+//                                                                 ^ punctuation.section.embedded.end.gsx
     </span>
     <span class={switch variant { case 1: "green" default: "gray" }}>
 //        ^ entity.other.attribute-name.class.gsx
