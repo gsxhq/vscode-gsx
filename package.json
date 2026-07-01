@@ -2,7 +2,7 @@
   "name": "gsx",
   "displayName": "gsx",
   "description": "Syntax highlighting and language support for gsx (.gsx) — JSX-style HTML templating for Go.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "gsxhq",
   "license": "MIT",
   "repository": { "type": "git", "url": "https://github.com/gsxhq/vscode-gsx" },
