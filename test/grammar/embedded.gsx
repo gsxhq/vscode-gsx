@@ -2,6 +2,19 @@
 package views
 
 component Page() {
+  <button @click=js`save(@{id})` style=css`width:@{pct}%`/>
+//        ^ entity.other.attribute-name.gsx
+//               ^ meta.embedded.block.js.gsx
+//                       ^ punctuation.section.embedded.begin.gsx
+//                                     ^ meta.embedded.block.css.gsx
+//                                               ^ punctuation.section.embedded.begin.gsx
+  <button @click={js`save(@{id})`} style={css`width:@{pct}%`}/>
+//               ^ punctuation.section.embedded.begin.gsx
+//                ^ meta.embedded.block.js.gsx
+//                        ^ punctuation.section.embedded.begin.gsx
+//                                       ^ punctuation.section.embedded.begin.gsx
+//                                        ^ meta.embedded.block.css.gsx
+//                                                  ^ punctuation.section.embedded.begin.gsx
   <style>
 //   ^ entity.name.tag.gsx
   .a { color: red }
