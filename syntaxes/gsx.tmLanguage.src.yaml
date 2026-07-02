@@ -22,13 +22,14 @@ repository:
         end: '-->'
   component:
     name: meta.component.gsx
-    begin: '^(component)\s+(?:\(([^)]*)\)\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*\(([^{]*)\)\s*(\{)\s*$'
+    begin: '^(component)\s+(?:\(([^)]*)\)\s+)?([A-Za-z_][A-Za-z0-9_]*)(\[[^\]]*\])?\s*\(([^{]*)\)\s*(\{)\s*$'
     beginCaptures:
       '1': { name: keyword.control.component.gsx }
       '2': { name: meta.embedded.line.go.gsx, patterns: [{ include: source.go }] }
       '3': { name: entity.name.function.gsx }
       '4': { name: meta.embedded.line.go.gsx, patterns: [{ include: source.go }] }
-      '5': { name: punctuation.section.block.begin.gsx }
+      '5': { name: meta.embedded.line.go.gsx, patterns: [{ include: source.go }] }
+      '6': { name: punctuation.section.block.begin.gsx }
     end: '^(\})\s*$'
     endCaptures:
       '1': { name: punctuation.section.block.end.gsx }
@@ -78,10 +79,11 @@ repository:
   component-tag:
     # Uppercase-initial (Card) or dotted (ui.Button, nav.Link) → component.
     name: meta.tag.component.gsx
-    begin: '(</?)((?:[a-z][a-zA-Z0-9]*\.)?[A-Z][A-Za-z0-9.]*)'
+    begin: '(</?)((?:[a-z][a-zA-Z0-9]*\.)?[A-Z][A-Za-z0-9.]*)(\[[^\]]+\])?'
     beginCaptures:
       '1': { name: punctuation.definition.tag.gsx }
       '2': { name: entity.name.type.component.gsx }
+      '3': { name: meta.embedded.line.go.gsx, patterns: [{ include: source.go }] }
     end: '(/?>)'
     endCaptures: { '1': { name: punctuation.definition.tag.gsx } }
     patterns: [{ include: '#attribute' }]
