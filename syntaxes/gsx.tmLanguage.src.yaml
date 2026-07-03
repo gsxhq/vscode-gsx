@@ -99,6 +99,10 @@ repository:
     patterns: [{ include: '#attribute' }]
   attribute:
     patterns:
+      # Source-only comments between attributes: bare // and /* */. Braced
+      # {/* */} / {// } are handled by #interp (embedded source.go). Comments
+      # first so a `//` in tag-interior position never falls through to text.
+      - include: '#comments'
       - include: '#go-block'
       - include: '#embedded-js-attribute'
       - include: '#embedded-css-attribute'
