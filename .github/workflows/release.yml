@@ -1,16 +1,86 @@
 name: Release
+
+# Manual, one-click release: pick a bump and this workflow gates, bumps,
+# tags, pushes, cuts a GitHub release, and publishes to both marketplaces.
+# (Mirrors gsxhq/vite-plugin-gsx's release workflow.)
 on:
-  push: { tags: ['v*'] }
-permissions: { contents: read }
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version bump: patch, minor, major, or an explicit version like 0.0.4"
+        required: true
+        default: patch
+
+permissions:
+  contents: write
+
 jobs:
-  publish:
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with: { fetch-depth: 0 }
       - uses: actions/setup-node@v6
         with: { node-version: 24 }
+      - uses: actions/setup-go@v5
+        with: { go-version: '1.26.1' }
       - run: npm ci
-      - run: npm run gen:grammar && npm run compile
+
+      # --- gate: same checks as ci.yml, so a dispatched release can never
+      #     publish a build that wouldn't have passed CI ---
+      - name: Generate grammar + assert no drift
+        run: |
+          npm run gen:grammar
+          git diff --exit-code syntaxes/gsx.tmLanguage.json \
+            || (echo "::error::grammar JSON stale — run npm run gen:grammar and commit"; exit 1)
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test:grammar
+      - run: npm run test:unit
+      - name: Install gsx for the integration test
+        run: |
+          go install github.com/gsxhq/gsx/cmd/gsx@latest
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+      - name: Integration smoke (headless)
+        run: xvfb-run -a npm run test:integration
+        env: { GSX_ON_PATH: '1' }
+
+      # --- bump ---
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Bump version
+        run: npm version "${{ inputs.version }}" --no-git-tag-version
+      - name: Read version
+        id: version
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Guard against re-releasing an existing tag
+        run: |
+          if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "::error::tag v${{ steps.version.outputs.version }} already exists — nothing to release"
+            exit 1
+          fi
+      - name: Commit and tag
+        run: |
+          git add package.json package-lock.json
+          git commit -m "chore: release v${{ steps.version.outputs.version }}"
+          git tag "v${{ steps.version.outputs.version }}"
+      - name: Push commit and tag
+        run: |
+          git push origin HEAD:main
+          git push origin "v${{ steps.version.outputs.version }}"
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ steps.version.outputs.version }}" \
+            --title "v${{ steps.version.outputs.version }}" \
+            --notes "Release gsx VS Code extension v${{ steps.version.outputs.version }}."
+
+      # --- publish (vsce/ovsx read the bumped version from package.json) ---
+      - name: Build for publish
+        run: npm run gen:grammar && npm run compile
       - name: Publish to VS Code Marketplace
         run: npx @vscode/vsce publish
         env: { VSCE_PAT: '${{ secrets.VSCE_PAT }}' }
