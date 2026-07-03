@@ -2,21 +2,34 @@
   "name": "gsx",
   "displayName": "gsx",
   "description": "Syntax highlighting and language support for gsx (.gsx) — JSX-style HTML templating for Go.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "gsxhq",
   "license": "MIT",
-  "repository": { "type": "git", "url": "https://github.com/gsxhq/vscode-gsx" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gsxhq/vscode-gsx"
+  },
   "icon": "icons/gsx.png",
-  "engines": { "vscode": "^1.85.0" },
-  "categories": ["Programming Languages"],
-  "activationEvents": ["onLanguage:gsx"],
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:gsx"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "languages": [
       {
         "id": "gsx",
-        "aliases": ["gsx"],
-        "extensions": [".gsx"],
+        "aliases": [
+          "gsx"
+        ],
+        "extensions": [
+          ".gsx"
+        ],
         "configuration": "./language-configuration.json"
       }
     ],
@@ -43,15 +56,25 @@
         },
         "gsx.trace.server": {
           "type": "string",
-          "enum": ["off", "messages", "verbose"],
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
           "default": "off",
           "description": "Trace the communication between VS Code and the gsx language server."
         }
       }
     },
     "commands": [
-      { "command": "gsx.installServer", "title": "gsx: Install/Update Language Server" },
-      { "command": "gsx.restartServer", "title": "gsx: Restart Language Server" }
+      {
+        "command": "gsx.installServer",
+        "title": "gsx: Install/Update Language Server"
+      },
+      {
+        "command": "gsx.restartServer",
+        "title": "gsx: Restart Language Server"
+      }
     ]
   },
   "scripts": {
