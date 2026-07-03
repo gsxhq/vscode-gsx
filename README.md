@@ -54,6 +54,24 @@ server. All diagnostics, hover, go-to-definition, references, and formatting
 responses come from that process. Syntax highlighting works independently of
 the binary via the bundled TextMate grammar.
 
+## Releasing
+
+Releases are one-click via the `Release` GitHub Actions workflow
+(`workflow_dispatch`). It runs the full CI gate, bumps `package.json`, tags,
+pushes to `main`, cuts a GitHub release, and publishes to the VS Code
+Marketplace + Open VSX. Update `CHANGELOG.md` on `main` **before** triggering —
+the workflow does not touch it.
+
+Trigger from the CLI (`version` is `patch` / `minor` / `major`, or an explicit
+version like `0.0.4`):
+
+```bash
+gh workflow run release.yml -f version=patch
+gh run watch "$(gh run list --workflow release.yml --limit 1 --json databaseId --jq '.[0].databaseId')"
+```
+
+Or from the GitHub UI: Actions → Release → Run workflow.
+
 ## Links
 
 - Documentation: [gsxhq.github.io](https://gsxhq.github.io)
