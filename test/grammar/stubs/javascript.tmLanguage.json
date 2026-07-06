@@ -1,1 +1,15 @@
-{"scopeName":"source.js","name":"JavaScript","patterns":[]}
+{
+  "scopeName": "source.js",
+  "name": "JavaScript",
+  "patterns": [
+    {
+      "comment": "Minimal model of the real JS grammar's brace nesting. The real grammar opens a nested begin/end context on `{` (objects, blocks, arrow bodies); once inside it, a gsx literal's top-level `#embedded-go-hole` pattern is out of scope. Reproduced here so the go-hole injection is actually exercised by the stub-based grammar tests.",
+      "name": "meta.block.js",
+      "begin": "\\{",
+      "beginCaptures": { "0": { "name": "punctuation.definition.block.js" } },
+      "end": "\\}",
+      "endCaptures": { "0": { "name": "punctuation.definition.block.js" } },
+      "patterns": [{ "include": "$self" }]
+    }
+  ]
+}

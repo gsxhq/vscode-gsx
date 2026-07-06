@@ -12,6 +12,15 @@
       "include": "source.go"
     }
   ],
+  "injections": {
+    "L:meta.embedded.block.js.gsx, L:meta.embedded.block.css.gsx": {
+      "patterns": [
+        {
+          "include": "#embedded-go-hole"
+        }
+      ]
+    }
+  },
   "repository": {
     "comments": {
       "patterns": [

@@ -9,6 +9,19 @@ patterns:
   - include: '#comments'
   - include: '#component'
   - include: source.go
+# Go holes (@{ … }) must win over the embedded JS/CSS grammars even when nested.
+# Inside a js`…`/css`…` literal (or <script>/<style> body) the hole rule is only
+# listed at the literal's top level, so as soon as source.js/source.css opens its
+# own begin/end context — a JS object `{…}`, an arrow body, a CSS block — the hole
+# rule falls out of scope. The JS grammar then eats `@{` as a decorator and, worse,
+# reads the literal's closing backtick as the start of a JS template string, so the
+# rest of the file is swallowed as JavaScript. An L:-priority injection re-applies
+# the hole rule at ANY depth within those embedded scopes, consuming `@{ … }` before
+# the host grammar can see the `@`.
+injections:
+  'L:meta.embedded.block.js.gsx, L:meta.embedded.block.css.gsx':
+    patterns:
+      - include: '#embedded-go-hole'
 repository:
   comments:
     patterns:
