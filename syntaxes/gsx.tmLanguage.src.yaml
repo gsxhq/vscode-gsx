@@ -119,6 +119,10 @@ repository:
       - include: '#go-block'
       - include: '#embedded-js-attribute'
       - include: '#embedded-css-attribute'
+      # Plain (non-JS, non-CSS) interpolating attribute literal: name=`…@{ expr }…`.
+      # Static text is a string; @{ } holes embed source.go. Must come before the
+      # bare attribute-name/`=` fallbacks so the backtick literal is not left plain.
+      - include: '#interpolated-literal-attribute'
       # class={…}/style={…}: embed source.go so value-form if/switch/case/default/else
       # highlight as Go keywords. Two separate rules (no alternation) so {capture 2}
       # is always the opening brace. Must come before #interp to take priority.
@@ -216,6 +220,18 @@ repository:
     patterns:
       - include: '#embedded-go-hole'
       - include: source.css
+  interpolated-literal-attribute:
+    name: meta.attribute.literal-value.gsx
+    begin: '([A-Za-z_@:][A-Za-z0-9_.:-]*)(\s*=\s*)(`)'
+    beginCaptures:
+      '1': { name: entity.other.attribute-name.gsx }
+      '2': { name: keyword.operator.assignment.gsx }
+      '3': { name: punctuation.definition.string.begin.gsx }
+    end: '(?<!\\)(?:\\\\)*\K`'
+    endCaptures: { '0': { name: punctuation.definition.string.end.gsx } }
+    contentName: string.interpolated.gsx
+    patterns:
+      - include: '#embedded-go-hole'
   script-element:
     begin: '(<)(script)\b([^>]*)(>)'
     beginCaptures:

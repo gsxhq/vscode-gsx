@@ -262,6 +262,9 @@
           "include": "#embedded-css-attribute"
         },
         {
+          "include": "#interpolated-literal-attribute"
+        },
+        {
           "name": "meta.attribute.class-value.gsx",
           "begin": "(class)\\s*=\\s*(\\{)",
           "beginCaptures": {
@@ -480,6 +483,33 @@
         },
         {
           "include": "source.css"
+        }
+      ]
+    },
+    "interpolated-literal-attribute": {
+      "name": "meta.attribute.literal-value.gsx",
+      "begin": "([A-Za-z_@:][A-Za-z0-9_.:-]*)(\\s*=\\s*)(`)",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.other.attribute-name.gsx"
+        },
+        "2": {
+          "name": "keyword.operator.assignment.gsx"
+        },
+        "3": {
+          "name": "punctuation.definition.string.begin.gsx"
+        }
+      },
+      "end": "(?<!\\\\)(?:\\\\\\\\)*\\K`",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.gsx"
+        }
+      },
+      "contentName": "string.interpolated.gsx",
+      "patterns": [
+        {
+          "include": "#embedded-go-hole"
         }
       ]
     },
