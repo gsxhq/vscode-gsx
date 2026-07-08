@@ -8,6 +8,9 @@ name: gsx
 patterns:
   - include: '#comments'
   - include: '#component'
+  # Top-level f`…` / f"…" values (var greeting = f`hi @{name}`) highlight their
+  # @{ } holes; js/css literals are attribute-context only, not standalone values.
+  - include: '#embedded-f-literal'
   - include: source.go
 # Go holes (@{ … }) must win over the embedded JS/CSS grammars even when nested.
 # Inside a js`…`/css`…` literal (or <script>/<style> body) the hole rule is only
@@ -66,7 +69,12 @@ repository:
     end: '\}\}'
     endCaptures: { '0': { name: punctuation.section.embedded.end.gsx } }
     contentName: source.go
-    patterns: [{ include: source.go }]
+    patterns:
+      - include: '#embedded-f-literal'
+      - include: '#fragment'
+      - include: '#component-tag'
+      - include: '#element-tag'
+      - include: source.go
   interp:
     name: meta.embedded.block.go.gsx
     begin: '(@?\{)'
@@ -75,8 +83,14 @@ repository:
     endCaptures: { '0': { name: punctuation.section.embedded.end.gsx } }
     contentName: source.go
     patterns:
+      # f/js/css literals and <tag>/<>/component-tag as Go-expression VALUES inside
+      # { } — e.g. { wrap(<div/>) }, { cond ? <a/> : <b/> }, { f`hi @{name}` }.
+      - include: '#embedded-f-literal'
       - include: '#embedded-js-literal'
       - include: '#embedded-css-literal'
+      - include: '#fragment'
+      - include: '#component-tag'
+      - include: '#element-tag'
       - include: source.go
   doctype:
     name: meta.tag.doctype.gsx
@@ -119,10 +133,10 @@ repository:
       - include: '#go-block'
       - include: '#embedded-js-attribute'
       - include: '#embedded-css-attribute'
-      # Plain (non-JS, non-CSS) interpolating attribute literal: name=`…@{ expr }…`.
-      # Static text is a string; @{ } holes embed source.go. Must come before the
-      # bare attribute-name/`=` fallbacks so the backtick literal is not left plain.
-      - include: '#interpolated-literal-attribute'
+      # f-prefixed interpolating attribute literal: name=f`…@{ expr }…` or name=f"…".
+      # (js/css attribute literals are the two includes above.) A BARE name=`…` is a
+      # plain Go raw string — handled by the backtick plain-string rule below.
+      - include: '#embedded-f-attribute'
       # class={…}/style={…}: embed source.go so value-form if/switch/case/default/else
       # highlight as Go keywords. Two separate rules (no alternation) so {capture 2}
       # is always the opening brace. Must come before #interp to take priority.
@@ -134,7 +148,9 @@ repository:
         end: '\}'
         endCaptures: { '0': { name: punctuation.section.embedded.end.gsx } }
         contentName: meta.embedded.block.go.gsx
-        patterns: [{ include: source.go }]
+        patterns:
+          - include: '#embedded-f-literal'
+          - include: source.go
       - name: meta.attribute.style-value.gsx
         begin: '(style)\s*=\s*(\{)'
         beginCaptures:
@@ -144,12 +160,17 @@ repository:
         endCaptures: { '0': { name: punctuation.section.embedded.end.gsx } }
         contentName: meta.embedded.block.go.gsx
         patterns:
+          - include: '#embedded-f-literal'
           - include: '#embedded-css-literal'
           - include: source.go
       - include: '#interp'
       - name: string.quoted.double.gsx
         begin: '"'
         end: '"'
+      # Bare name=`…` — a plain, non-interpolating Go raw string (no @{ } holes).
+      - name: string.quoted.other.backtick.gsx
+        begin: '`'
+        end: '`'
       - name: keyword.operator.assignment.gsx
         match: '='
       - name: entity.other.attribute-name.gsx
@@ -162,13 +183,34 @@ repository:
     endCaptures: { '0': { name: punctuation.section.embedded.end.gsx } }
     contentName: source.go
     patterns: [{ include: source.go }]
-  embedded-js-literal:
-    name: meta.embedded.block.js.gsx
-    begin: '(js)(`)'
+  # ── Interpolating literals: f / js / css prefix, either delimiter (` or "). ──
+  # Interpolation is OPT-IN: only a prefix immediately glued to the delimiter
+  # interpolates. A BARE `…` / "…" is a plain Go string (handled by source.go in
+  # value position, or the plain-string rules in #attribute) with NO @{ } holes.
+  # `f`  = generic auto-escaped text (no sublanguage); `js`/`css` embed
+  # source.js / source.css. @{ } holes always embed source.go. The
+  # `(?<!\\)(?:\\\\)*\K\N` end backreferences the opening delimiter so `…` closes
+  # on a backtick and "…" on a double-quote, each honoring its \` / \" escape.
+  # The `(?<![A-Za-z0-9_.])` guard mirrors the compiler rule: the prefix must be a
+  # standalone token (an identifier glued to a string is never valid Go).
+  embedded-f-literal:
+    name: meta.embedded.block.fstring.gsx
+    begin: '(?<![A-Za-z0-9_.])(f)([`"])'
     beginCaptures:
       '1': { name: support.type.embedded-language.gsx }
       '2': { name: punctuation.definition.string.begin.gsx }
-    end: '(?<!\\)(?:\\\\)*\K`'
+    end: '(?<!\\)(?:\\\\)*\K\2'
+    endCaptures: { '0': { name: punctuation.definition.string.end.gsx } }
+    contentName: string.interpolated.gsx
+    patterns:
+      - include: '#embedded-go-hole'
+  embedded-js-literal:
+    name: meta.embedded.block.js.gsx
+    begin: '(?<![A-Za-z0-9_.])(js)([`"])'
+    beginCaptures:
+      '1': { name: support.type.embedded-language.gsx }
+      '2': { name: punctuation.definition.string.begin.gsx }
+    end: '(?<!\\)(?:\\\\)*\K\2'
     endCaptures: { '0': { name: punctuation.definition.string.end.gsx } }
     contentName: source.js
     patterns:
@@ -176,26 +218,42 @@ repository:
       - include: source.js
   embedded-css-literal:
     name: meta.embedded.block.css.gsx
-    begin: '(css)(`)'
+    begin: '(?<![A-Za-z0-9_.])(css)([`"])'
     beginCaptures:
       '1': { name: support.type.embedded-language.gsx }
       '2': { name: punctuation.definition.string.begin.gsx }
-    end: '(?<!\\)(?:\\\\)*\K`'
+    end: '(?<!\\)(?:\\\\)*\K\2'
     endCaptures: { '0': { name: punctuation.definition.string.end.gsx } }
     contentName: source.css
     patterns:
       - include: '#embedded-go-hole'
       - include: source.css
-  embedded-js-attribute:
-    name: meta.embedded.block.js.gsx
-    begin: '([A-Za-z_@:][A-Za-z0-9_.:-]*)(\s*=\s*)(\{?)(js)(`)'
+  embedded-f-attribute:
+    name: meta.embedded.block.fstring.gsx
+    begin: '([A-Za-z_@:][A-Za-z0-9_.:-]*)(\s*=\s*)(\{?)(f)([`"])'
     beginCaptures:
       '1': { name: entity.other.attribute-name.gsx }
       '2': { name: keyword.operator.assignment.gsx }
       '3': { name: punctuation.section.embedded.begin.gsx }
       '4': { name: support.type.embedded-language.gsx }
       '5': { name: punctuation.definition.string.begin.gsx }
-    end: '((?<!\\)(?:\\\\)*\K`)(\})?'
+    end: '((?<!\\)(?:\\\\)*\K\5)(\})?'
+    endCaptures:
+      '1': { name: punctuation.definition.string.end.gsx }
+      '2': { name: punctuation.section.embedded.end.gsx }
+    contentName: string.interpolated.gsx
+    patterns:
+      - include: '#embedded-go-hole'
+  embedded-js-attribute:
+    name: meta.embedded.block.js.gsx
+    begin: '([A-Za-z_@:][A-Za-z0-9_.:-]*)(\s*=\s*)(\{?)(js)([`"])'
+    beginCaptures:
+      '1': { name: entity.other.attribute-name.gsx }
+      '2': { name: keyword.operator.assignment.gsx }
+      '3': { name: punctuation.section.embedded.begin.gsx }
+      '4': { name: support.type.embedded-language.gsx }
+      '5': { name: punctuation.definition.string.begin.gsx }
+    end: '((?<!\\)(?:\\\\)*\K\5)(\})?'
     endCaptures:
       '1': { name: punctuation.definition.string.end.gsx }
       '2': { name: punctuation.section.embedded.end.gsx }
@@ -205,14 +263,14 @@ repository:
       - include: source.js
   embedded-css-attribute:
     name: meta.embedded.block.css.gsx
-    begin: '([A-Za-z_@:][A-Za-z0-9_.:-]*)(\s*=\s*)(\{?)(css)(`)'
+    begin: '([A-Za-z_@:][A-Za-z0-9_.:-]*)(\s*=\s*)(\{?)(css)([`"])'
     beginCaptures:
       '1': { name: entity.other.attribute-name.gsx }
       '2': { name: keyword.operator.assignment.gsx }
       '3': { name: punctuation.section.embedded.begin.gsx }
       '4': { name: support.type.embedded-language.gsx }
       '5': { name: punctuation.definition.string.begin.gsx }
-    end: '((?<!\\)(?:\\\\)*\K`)(\})?'
+    end: '((?<!\\)(?:\\\\)*\K\5)(\})?'
     endCaptures:
       '1': { name: punctuation.definition.string.end.gsx }
       '2': { name: punctuation.section.embedded.end.gsx }
@@ -220,18 +278,6 @@ repository:
     patterns:
       - include: '#embedded-go-hole'
       - include: source.css
-  interpolated-literal-attribute:
-    name: meta.attribute.literal-value.gsx
-    begin: '([A-Za-z_@:][A-Za-z0-9_.:-]*)(\s*=\s*)(`)'
-    beginCaptures:
-      '1': { name: entity.other.attribute-name.gsx }
-      '2': { name: keyword.operator.assignment.gsx }
-      '3': { name: punctuation.definition.string.begin.gsx }
-    end: '(?<!\\)(?:\\\\)*\K`'
-    endCaptures: { '0': { name: punctuation.definition.string.end.gsx } }
-    contentName: string.interpolated.gsx
-    patterns:
-      - include: '#embedded-go-hole'
   script-element:
     begin: '(<)(script)\b([^>]*)(>)'
     beginCaptures:
