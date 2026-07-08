@@ -11,6 +11,12 @@ patterns:
   # Top-level f`…` / f"…" values (var greeting = f`hi @{name}`) highlight their
   # @{ } holes; js/css literals are attribute-context only, not standalone values.
   - include: '#embedded-f-literal'
+  # Element/fragment/component literals as values in top-level Go and func bodies
+  # (var icon = <Icon/>, return <div/>, struct fields) — the element-literals
+  # feature. Inside component bodies these come from #markup instead.
+  - include: '#fragment'
+  - include: '#component-tag'
+  - include: '#element-tag'
   - include: source.go
 # Go holes (@{ … }) must win over the embedded JS/CSS grammars even when nested.
 # Inside a js`…`/css`…` literal (or <script>/<style> body) the hole rule is only
