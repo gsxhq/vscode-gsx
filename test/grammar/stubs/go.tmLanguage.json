@@ -1,1 +1,19 @@
-{"scopeName":"source.go","name":"Go","patterns":[]}
+{
+  "scopeName": "source.go",
+  "name": "Go",
+  "patterns": [{ "include": "#main" }],
+  "repository": {
+    "main": {
+      "patterns": [
+        { "name": "comment.line.double-slash.go", "match": "//.*$" },
+        { "name": "comment.block.go", "begin": "/\\*", "end": "\\*/" },
+        { "name": "string.quoted.double.go", "begin": "\"", "end": "\"", "patterns": [{ "match": "\\\\." }] },
+        { "name": "string.quoted.raw.go", "begin": "`", "end": "`" },
+        { "name": "string.quoted.single.go", "begin": "'", "end": "'", "patterns": [{ "match": "\\\\." }] },
+        { "name": "keyword.operator.comparison.go", "match": "<=|>=|==|!=|<|>" },
+        { "name": "keyword.control.go", "match": "\\b(package|import|var|const|func|type|struct|interface|map|chan|return|if|else|for|range|switch|case|default)\\b" },
+        { "begin": "\\{", "end": "\\}", "patterns": [{ "include": "#main" }] }
+      ]
+    }
+  }
+}

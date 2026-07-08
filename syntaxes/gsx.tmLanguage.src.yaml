@@ -31,6 +31,19 @@ injections:
   'L:meta.embedded.block.js.gsx, L:meta.embedded.block.css.gsx':
     patterns:
       - include: '#embedded-go-hole'
+  # Element/fragment/component literals are Go VALUES that may appear anywhere Go
+  # code does — including inside a func body's `{ … }`, which the embedded Go
+  # grammar owns as its own block context (so the root #component-tag/#element-tag
+  # rules never get a turn there and `<Icon/>` reads as a `<` comparison). This
+  # L:-priority injection re-applies the tag rules at any depth within gsx source,
+  # excluding strings/comments and the js/css/script/style embedded regions where a
+  # '<' is not gsx markup. gofmt-spaced `a < b` does not match (the tag rules need
+  # '<' glued to a tag-name char).
+  'L:source.gsx -string -comment -meta.embedded.block.js.gsx -meta.embedded.block.css.gsx':
+    patterns:
+      - include: '#fragment'
+      - include: '#component-tag'
+      - include: '#element-tag'
 repository:
   comments:
     patterns:
