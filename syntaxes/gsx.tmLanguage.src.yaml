@@ -8,9 +8,12 @@ name: gsx
 patterns:
   - include: '#comments'
   - include: '#component'
-  # Top-level f`…` / f"…" values (var greeting = f`hi @{name}`) highlight their
-  # @{ } holes; js/css literals are attribute-context only, not standalone values.
+  # Top-level f`…`/js`…`/css`…` values (var greeting = f`hi @{name}`,
+  # var snippet = js`emit(@{id})`) — all three interpolating literals are valid
+  # Go-expression values, not just attribute values; @{ } holes highlight.
   - include: '#embedded-f-literal'
+  - include: '#embedded-js-literal'
+  - include: '#embedded-css-literal'
   # Element/fragment/component literals as values in top-level Go and func bodies
   # (var icon = <Icon/>, return <div/>, struct fields) — the element-literals
   # feature. Inside component bodies these come from #markup instead.
@@ -90,6 +93,8 @@ repository:
     contentName: source.go
     patterns:
       - include: '#embedded-f-literal'
+      - include: '#embedded-js-literal'
+      - include: '#embedded-css-literal'
       - include: '#fragment'
       - include: '#component-tag'
       - include: '#element-tag'
