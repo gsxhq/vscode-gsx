@@ -79,6 +79,7 @@
   },
   "scripts": {
     "gen:grammar": "node scripts/build-grammar.mjs",
+    "sync:corpus": "node scripts/sync-authoritative-corpus.mjs",
     "compile": "node esbuild.mjs",
     "watch": "node esbuild.mjs --watch",
     "typecheck": "tsc --noEmit",
