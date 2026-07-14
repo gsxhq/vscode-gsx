@@ -87,6 +87,7 @@
     "test:unit": "vitest run test/unit",
     "test:corpus": "vitest run test/grammar/authoritative.test.ts",
     "test:grammar": "vscode-tmgrammar-test -g test/grammar/stubs/go.tmLanguage.json -g test/grammar/stubs/javascript.tmLanguage.json -g test/grammar/stubs/css.tmLanguage.json \"test/grammar/**/*.gsx\"",
+    "test": "npm run test:unit && npm run test:grammar && npm run test:corpus",
     "test:integration": "npm run compile && tsc -p ./ --outDir out-test && node out-test/test/integration/runTest.js",
     "vscode:prepublish": "npm run gen:grammar && npm run compile",
     "package": "npm run gen:grammar && vsce package"
