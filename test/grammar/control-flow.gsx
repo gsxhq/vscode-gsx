@@ -20,4 +20,14 @@ component Demo(n int, kind string) {
     <b>it's ok</b>
 //       ^ -string.quoted.single.go
   } }</span>
+  <span>{ switch {
+//        ^ keyword.control.go
+  case n > 0:
+//^ keyword.control.go
+    <b>positive</b>
+//     ^ meta.component.gsx -meta.embedded.block.go.gsx
+  default:
+//^ keyword.control.go
+    <b>zero</b>
+  } }</span>
 }
