@@ -4,6 +4,7 @@ package views
 component Demo(n int, kind string) {
   <p>{ if n > 0 { Don't panic } else { fine } }</p>
 //     ^ keyword.control.go
+//                ^ meta.component.gsx -meta.embedded.block.go.gsx
 //                   ^ -string.quoted.single.go
 //                              ^ keyword.control.go
   <span>{ switch kind {
@@ -12,6 +13,7 @@ component Demo(n int, kind string) {
 //^ keyword.control.go
 //     ^ string.quoted.double.go
     <b>can't warn</b>
+//     ^ meta.component.gsx -meta.embedded.block.go.gsx
 //        ^ -string.quoted.single.go
   default:
 //^ keyword.control.go

@@ -124,7 +124,9 @@ repository:
   # behavior via #interp's contentName: source.go) made a plain apostrophe/quote in
   # body prose open a Go string/rune literal that ran away across the file.
   control-flow:
-    name: meta.embedded.block.go.gsx
+    # No blanket `name`: only the condition/clause is Go (scoped by source.go
+    # token-by-token). The branch bodies are plain gsx child content, so they must
+    # NOT inherit an embedded-go block scope — that would colour body prose as Go.
     begin: '(\{)\s*(if|for)\b'
     beginCaptures:
       '1': { name: punctuation.section.embedded.begin.gsx }
@@ -150,7 +152,8 @@ repository:
   # Switch is separate: its case bodies are UNBRACED (they run from `case V:` /
   # `default:` to the next case/default or the closing brace).
   control-flow-switch:
-    name: meta.embedded.block.go.gsx
+    # No blanket `name` — see #control-flow. Only the switch subject and case
+    # values are Go; case bodies are plain gsx child content.
     begin: '(\{)\s*(switch)\b'
     beginCaptures:
       '1': { name: punctuation.section.embedded.begin.gsx }

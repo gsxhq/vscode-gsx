@@ -237,7 +237,6 @@
       ]
     },
     "control-flow": {
-      "name": "meta.embedded.block.go.gsx",
       "begin": "(\\{)\\s*(if|for)\\b",
       "beginCaptures": {
         "1": {
@@ -286,7 +285,6 @@
       ]
     },
     "control-flow-switch": {
-      "name": "meta.embedded.block.go.gsx",
       "begin": "(\\{)\\s*(switch)\\b",
       "beginCaptures": {
         "1": {
