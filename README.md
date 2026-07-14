@@ -54,6 +54,23 @@ server. All diagnostics, hover, go-to-definition, references, and formatting
 responses come from that process. Syntax highlighting works independently of
 the binary via the bundled TextMate grammar.
 
+## Testing the grammar
+
+Two tiers, run together by `npm test`:
+
+- **Curated scope assertions** (`npm run test:grammar`) — the `test/grammar/*.gsx`
+  files pin exact scopes at specific positions (`vscode-tmgrammar-test`).
+- **Corpus balance gate** (`npm run test:corpus`) — `test/corpus-authoritative/`
+  holds `.gsx` snippets vendored from the canonical gsx codegen corpus
+  (`gsx/internal/corpus/testdata/cases/**`). The gate tokenizes each with the
+  grammar and asserts the scope stack returns to root at EOF, catching *runaway*
+  scopes (an unterminated string/comment/embedded block that bleeds across the
+  file). It does not check per-token correctness — the curated tier does that.
+
+Re-sync the corpus when the gsx corpus changes: `npm run sync:corpus` (gsx
+checkout at `../gsx` or `$GSX_REPO`). This mirrors tree-sitter-gsx's
+authoritative-corpus gate.
+
 ## Releasing
 
 Releases are one-click via the `Release` GitHub Actions workflow
