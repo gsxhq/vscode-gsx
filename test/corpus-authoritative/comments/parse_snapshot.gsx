@@ -10,4 +10,9 @@ component Doc(name string) {
 	/>
 	<p>{/* block */}Visible{// line
 	}text // literal</p>
+	<div>
+		<span>a</span>
+		// bare note
+		<span>b</span>
+	</div>
 }

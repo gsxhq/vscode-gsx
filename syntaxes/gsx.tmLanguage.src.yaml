@@ -102,6 +102,9 @@ repository:
       - include: '#script-element'
       - include: '#style-element'
       - include: '#doctype'
+      - include: '#processing-instruction-marker'
+      - include: '#processing-instruction-start'
+      - include: '#processing-instruction-end'
       - include: '#fragment'
       - include: '#component-tag'
       - include: '#element-tag'
@@ -197,12 +200,20 @@ repository:
     # `case VALUE:` or `default:` — VALUE (group 2) is real Go; the body after `:`
     # is child content until the next case/default or the closing brace (a
     # lookahead end, so the delimiter is not consumed).
-    begin: '\b(case|default)\b([^:]*)(:)'
+    #
+    # Anchored to line start (both begin and the lookahead end): a `case …:` that
+    # is NOT the first thing on its line is arm-body TEXT, not a label
+    # (parser/markup.go `caseBodyLabelAfterWS` — "…in that case: no" inside an arm
+    # stays prose). gsx fmt puts every label on its own line, and this grammar is
+    # written against canonical layout (see file header), so the anchor costs
+    # nothing on formatted source; an unformatted one-line
+    # `{ switch k { case "a": … } }` loses label colouring until `gsx fmt` runs.
+    begin: '^\s*(case|default)\b([^:]*)(:)'
     beginCaptures:
       '1': { name: keyword.control.go }
       '2': { name: meta.embedded.line.go.gsx, patterns: [{ include: source.go }] }
       '3': { name: punctuation.separator.gsx }
-    end: '(?=\b(?:case|default)\b|\})'
+    end: '(?=^\s*(?:case|default)\b|\})'
     patterns:
       - include: '#markup'
   doctype:
@@ -212,6 +223,41 @@ repository:
       '1': { name: punctuation.definition.tag.gsx }
       '2': { name: keyword.other.doctype.gsx }
       '4': { name: punctuation.definition.tag.gsx }
+  # <?marker name=VALUE> / <?start name=VALUE> ... <?end> — processing
+  # instructions (client-side patching markers/regions, parser/markup.go
+  # parsePI). `marker`/`start`/`end` are the only valid targets; VALUE is a
+  # "literal" or {expr}, both handled by #attribute like any other tag. Like
+  # #doctype, these are "markup only" — never included at top level/injections
+  # (a PI is not a valid Go-expression value, unlike #fragment/#element-tag).
+  # <?start> and <?end> are matched independently (mirrors how #element-tag's
+  # open/close tags are two separate, unpaired matches) rather than a single
+  # begin/end spanning the region body — this grammar never nests tag scopes
+  # around children (see file header: coarse, not a real parser).
+  processing-instruction-marker:
+    name: meta.tag.processing-instruction.marker.gsx
+    begin: '(<\?)(marker)\b'
+    beginCaptures:
+      '1': { name: punctuation.definition.tag.gsx }
+      '2': { name: entity.name.tag.processing-instruction.gsx }
+    end: '(>)'
+    endCaptures: { '1': { name: punctuation.definition.tag.gsx } }
+    patterns: [{ include: '#attribute' }]
+  processing-instruction-start:
+    name: meta.tag.processing-instruction.start.gsx
+    begin: '(<\?)(start)\b'
+    beginCaptures:
+      '1': { name: punctuation.definition.tag.gsx }
+      '2': { name: entity.name.tag.processing-instruction.gsx }
+    end: '(>)'
+    endCaptures: { '1': { name: punctuation.definition.tag.gsx } }
+    patterns: [{ include: '#attribute' }]
+  processing-instruction-end:
+    name: meta.tag.processing-instruction.end.gsx
+    match: '(<\?)(end)\b\s*(>)'
+    captures:
+      '1': { name: punctuation.definition.tag.gsx }
+      '2': { name: entity.name.tag.processing-instruction.gsx }
+      '3': { name: punctuation.definition.tag.gsx }
   fragment:
     name: meta.tag.fragment.gsx
     match: '(</?>)'

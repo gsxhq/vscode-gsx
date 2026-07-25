@@ -30,4 +30,14 @@ component Demo(n int, kind string) {
 //^ keyword.control.go
     <b>zero</b>
   } }</span>
+  <span>{ switch kind {
+  case "a":
+//^ keyword.control.go
+    prose that mentions a case 1: and keeps going
+//                          ^ - keyword.control.go
+//                                ^ - punctuation.separator.gsx
+  default:
+//^ keyword.control.go
+    <b>z</b>
+  } }</span>
 }
