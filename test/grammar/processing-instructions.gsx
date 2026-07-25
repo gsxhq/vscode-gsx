@@ -25,4 +25,9 @@ component Page(id string) {
 //^ punctuation.definition.tag.gsx
 //   ^ entity.name.tag.processing-instruction.gsx
 //     ^ punctuation.definition.tag.gsx
+  <?markerx name="a">
+//   ^ - entity.name.tag.processing-instruction.gsx
+//   ^ - entity.name.tag.gsx
+  <?foo name="a">
+//   ^ - entity.name.tag.processing-instruction.gsx
 }
