@@ -21,6 +21,9 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run test:grammar
+      # EOF scope-balance gate over the vendored gsx corpus. Part of `npm test`
+      # locally but was missing here, so a resync could land unverified.
+      - run: npm run test:corpus
       - run: npm run test:unit
       - name: Install gsx for the integration test
         run: |
