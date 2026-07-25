@@ -58,6 +58,28 @@ repository:
       - name: comment.block.html.gsx
         begin: '<!--'
         end: '-->'
+  # Child-content position (#markup), NOT #attribute: a bare `//` is only a
+  # comment there when it is the first non-whitespace on its line (matching
+  # the real parser's atBareContentComment) — anywhere else on the line it is
+  # literal text that renders. `^[ \t]*//.*$` uses oniguruma's per-line `^`
+  # anchor (vscode-textmate scans one source line at a time) so this simply
+  # cannot match a `//` preceded by real content earlier on the same line —
+  # no approximation needed for that half of the rule, unlike tree-sitter-gsx
+  # which has no lookbehind and must fold whitespace into the token instead.
+  # Bare `/* */` is NOT included here: unlike inside a tag, the real grammar
+  # never treats a bare block comment as a comment in child content (only the
+  # braced `{/* … */}` form, which already delegates to #interp + source.go).
+  #
+  # Known approximation: like tree-sitter-gsx, this grammar has no notion of
+  # "inside a <pre>/<textarea> subtree" (verbatim text there in the real
+  # parser) — a line-start `//` inside one is still colored as a comment.
+  content-comments:
+    patterns:
+      - name: comment.line.double-slash.gsx
+        match: '^[ \t]*//.*$'
+      - name: comment.block.html.gsx
+        begin: '<!--'
+        end: '-->'
   component:
     name: meta.component.gsx
     begin: '^(component)\s+(?:\(([^)]*)\)\s+)?([A-Za-z_][A-Za-z0-9_]*)(\[[^\]]*\])?\s*\(([^{]*)\)\s*(\{)\s*$'
@@ -75,7 +97,7 @@ repository:
       - include: '#markup'
   markup:
     patterns:
-      - include: '#comments'
+      - include: '#content-comments'
       - include: '#go-block'
       - include: '#script-element'
       - include: '#style-element'
