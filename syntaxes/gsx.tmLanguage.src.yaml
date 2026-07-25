@@ -200,12 +200,20 @@ repository:
     # `case VALUE:` or `default:` — VALUE (group 2) is real Go; the body after `:`
     # is child content until the next case/default or the closing brace (a
     # lookahead end, so the delimiter is not consumed).
-    begin: '\b(case|default)\b([^:]*)(:)'
+    #
+    # Anchored to line start (both begin and the lookahead end): a `case …:` that
+    # is NOT the first thing on its line is arm-body TEXT, not a label
+    # (parser/markup.go `caseBodyLabelAfterWS` — "…in that case: no" inside an arm
+    # stays prose). gsx fmt puts every label on its own line, and this grammar is
+    # written against canonical layout (see file header), so the anchor costs
+    # nothing on formatted source; an unformatted one-line
+    # `{ switch k { case "a": … } }` loses label colouring until `gsx fmt` runs.
+    begin: '^\s*(case|default)\b([^:]*)(:)'
     beginCaptures:
       '1': { name: keyword.control.go }
       '2': { name: meta.embedded.line.go.gsx, patterns: [{ include: source.go }] }
       '3': { name: punctuation.separator.gsx }
-    end: '(?=\b(?:case|default)\b|\})'
+    end: '(?=^\s*(?:case|default)\b|\})'
     patterns:
       - include: '#markup'
   doctype:

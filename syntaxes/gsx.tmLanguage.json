@@ -351,7 +351,7 @@
       ]
     },
     "switch-case": {
-      "begin": "\\b(case|default)\\b([^:]*)(:)",
+      "begin": "^\\s*(case|default)\\b([^:]*)(:)",
       "beginCaptures": {
         "1": {
           "name": "keyword.control.go"
@@ -368,7 +368,7 @@
           "name": "punctuation.separator.gsx"
         }
       },
-      "end": "(?=\\b(?:case|default)\\b|\\})",
+      "end": "(?=^\\s*(?:case|default)\\b|\\})",
       "patterns": [
         {
           "include": "#markup"
