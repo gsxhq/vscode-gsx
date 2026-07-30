@@ -7,5 +7,5 @@ component Card(toggleAttrs gsx.Attrs) {
 }
 
 component Page() {
-	<Card toggleAttrs={{ "disabled": true, "checked": false, "data-show": true, "data-hide": false, "active": gsx.Toggle(true) }}/>
+	<Card toggleAttrs={{ "disabled": true, "checked": false, "data-show": true, "data-hide": false, "aria-expanded": false, "x-show": true, "active": gsx.Toggle(true) }}/>
 }
