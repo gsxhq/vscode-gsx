@@ -1,0 +1,3 @@
+package views
+
+component C(n int, m int) { <div { switch n { case 1: { switch m { case 2: data-m="y" } } default: data-other="y" } }>x</div> }

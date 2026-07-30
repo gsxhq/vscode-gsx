@@ -309,6 +309,7 @@ repository:
         contentName: meta.embedded.block.go.gsx
         patterns:
           - include: '#embedded-f-literal'
+          - include: '#composable-arm-body'
           - include: source.go
       - name: meta.attribute.style-value.gsx
         begin: '(style)\s*=\s*(\{)'
@@ -321,6 +322,7 @@ repository:
         patterns:
           - include: '#embedded-f-literal'
           - include: '#embedded-css-literal'
+          - include: '#composable-arm-body'
           - include: source.go
       - include: '#interp'
       - name: string.quoted.double.gsx
@@ -334,6 +336,23 @@ repository:
         match: '='
       - name: entity.other.attribute-name.gsx
         match: '[A-Za-z_@:][A-Za-z0-9_.:-]*'
+  # A value-form's nested braces inside class={…}/style={…}: the `{ … }` of an
+  # if/else arm, and a switch's body braces. Without this, source.go's block
+  # rule claims that region first and its raw-string rule then colours a
+  # `` f`…` ``/`` css`…` `` arm as a plain Go raw string, losing the
+  # interpolation holes and the sublanguage. Listed before source.go and
+  # consuming its own closing brace, the same way #control-body keeps
+  # #control-flow's `end` aligned.
+  composable-arm-body:
+    begin: '(\{)'
+    beginCaptures: { '1': { name: punctuation.section.embedded.begin.gsx } }
+    end: '(\})'
+    endCaptures: { '1': { name: punctuation.section.embedded.end.gsx } }
+    patterns:
+      - include: '#embedded-f-literal'
+      - include: '#embedded-css-literal'
+      - include: '#composable-arm-body'
+      - include: source.go
   embedded-go-hole:
     name: meta.embedded.block.go.gsx
     begin: '@\{'

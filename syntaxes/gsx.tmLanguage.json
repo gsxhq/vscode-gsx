@@ -554,6 +554,9 @@
               "include": "#embedded-f-literal"
             },
             {
+              "include": "#composable-arm-body"
+            },
+            {
               "include": "source.go"
             }
           ]
@@ -584,6 +587,9 @@
               "include": "#embedded-css-literal"
             },
             {
+              "include": "#composable-arm-body"
+            },
+            {
               "include": "source.go"
             }
           ]
@@ -608,6 +614,34 @@
         {
           "name": "entity.other.attribute-name.gsx",
           "match": "[A-Za-z_@:][A-Za-z0-9_.:-]*"
+        }
+      ]
+    },
+    "composable-arm-body": {
+      "begin": "(\\{)",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.section.embedded.begin.gsx"
+        }
+      },
+      "end": "(\\})",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.section.embedded.end.gsx"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#embedded-f-literal"
+        },
+        {
+          "include": "#embedded-css-literal"
+        },
+        {
+          "include": "#composable-arm-body"
+        },
+        {
+          "include": "source.go"
         }
       ]
     },
