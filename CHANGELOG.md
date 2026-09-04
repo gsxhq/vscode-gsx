@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Attribute names follow gsx's widened HTML authoring rule: any character except whitespace, controls, `"`, `'`, `<`, `>`, `/`, `=`, `{`, `}` — so punctuation-led names like `.prop`, `?disabled`, `#ref`, `[a]`, `(b)`, `*ngIf`, `on:click|preventDefault`, `a&b`, `$x`, `!y`, and non-ASCII names are highlighted as attribute names (in `name="…"`, `name={…}`, bare, and `` name=f`…` ``/`` js`…` ``/`` css`…` `` forms, on elements and component tags) instead of being left uncolored.
+
 ## 0.0.11
 - Highlight processing instructions: `<?marker name=...>` and `<?start name=...>` ... `<?end>` now get their own tag highlighting, matching gsx's new syntax.
 - Fix: a `case ...:`/`default:` appearing mid-sentence inside switch-arm prose is no longer miscolored as a Go keyword — only a label that starts its own line is highlighted, matching gsx's parser.

@@ -334,8 +334,15 @@ repository:
         end: '`'
       - name: keyword.operator.assignment.gsx
         match: '='
+      # Attribute names follow the HTML authoring rule (gsx internal/htmlattr.NameRune):
+      # any rune except controls (C0/C1), whitespace, `"`, `'`, `>`, `/`, `=`, minus the gsx
+      # exclusions `<`, `{`, `}` and the value-literal backtick. There is NO distinct
+      # first-rune class, so `.prop`,
+      # `?disabled`, `#ref`, `[a]`, `(b)`, `on:click|preventDefault`, `*ngIf`, `a&b`
+      # are all names. Unicode noncharacters are not excluded (irrelevant to a
+      # highlighter). The same class is reused by the embedded-*-attribute rules.
       - name: entity.other.attribute-name.gsx
-        match: '[A-Za-z_@:][A-Za-z0-9_.:-]*'
+        match: '[^\s"''<>/={}`\p{Cc}]+'
   # A value-form's nested braces inside class={…}/style={…}: the `{ … }` of an
   # if/else arm, and a switch's body braces. Without this, source.go's block
   # rule claims that region first and its raw-string rule then colours a
@@ -408,7 +415,7 @@ repository:
       - include: source.css
   embedded-f-attribute:
     name: meta.embedded.block.fstring.gsx
-    begin: '([A-Za-z_@:][A-Za-z0-9_.:-]*)(\s*=\s*)(\{?)(f)([`"])'
+    begin: '([^\s"''<>/={}`\p{Cc}]+)(\s*=\s*)(\{?)(f)([`"])'
     beginCaptures:
       '1': { name: entity.other.attribute-name.gsx }
       '2': { name: keyword.operator.assignment.gsx }
@@ -424,7 +431,7 @@ repository:
       - include: '#embedded-go-hole'
   embedded-js-attribute:
     name: meta.embedded.block.js.gsx
-    begin: '([A-Za-z_@:][A-Za-z0-9_.:-]*)(\s*=\s*)(\{?)(js)([`"])'
+    begin: '([^\s"''<>/={}`\p{Cc}]+)(\s*=\s*)(\{?)(js)([`"])'
     beginCaptures:
       '1': { name: entity.other.attribute-name.gsx }
       '2': { name: keyword.operator.assignment.gsx }
@@ -441,7 +448,7 @@ repository:
       - include: source.js
   embedded-css-attribute:
     name: meta.embedded.block.css.gsx
-    begin: '([A-Za-z_@:][A-Za-z0-9_.:-]*)(\s*=\s*)(\{?)(css)([`"])'
+    begin: '([^\s"''<>/={}`\p{Cc}]+)(\s*=\s*)(\{?)(css)([`"])'
     beginCaptures:
       '1': { name: entity.other.attribute-name.gsx }
       '2': { name: keyword.operator.assignment.gsx }
