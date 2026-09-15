@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.0.12
 - Internal: upgrade `@vscode/test-electron` to 3.x so `npm run test:integration` can launch VS Code 1.137+ (no user-facing change).
 - Find a project-pinned gsx (#9): when the workspace `go.mod` declares `tool github.com/gsxhq/gsx/cmd/gsx`, the language server runs as `go tool gsx lsp` from the workspace folder, so the project's pinned version is used and no separate install is needed.
 - `gsx.server.path` expands `${workspaceFolder}` and a leading `~`, and resolves a relative path against the workspace folder, so a committed `.vscode/settings.json` can point at a project-relative binary.
