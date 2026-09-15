@@ -52,7 +52,7 @@
         "gsx.server.path": {
           "type": "string",
           "default": "",
-          "description": "Absolute path to the gsx binary. Empty = auto-discover (PATH, GOBIN, GOPATH/bin)."
+          "description": "Path to the gsx binary. ${workspaceFolder} and a leading ~ are expanded; a relative path is resolved against the workspace folder. Empty = auto-discover (go.mod tool directive, PATH, GOBIN, GOPATH/bin)."
         },
         "gsx.trace.server": {
           "type": "string",
