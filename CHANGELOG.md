@@ -1,6 +1,10 @@
 # Changelog
 
 ## Unreleased
+- Find a project-pinned gsx (#9): when the workspace `go.mod` declares `tool github.com/gsxhq/gsx/cmd/gsx`, the language server runs as `go tool gsx lsp` from the workspace folder, so the project's pinned version is used and no separate install is needed.
+- `gsx.server.path` expands `${workspaceFolder}` and a leading `~`, and resolves a relative path against the workspace folder, so a committed `.vscode/settings.json` can point at a project-relative binary.
+- Discovery (`go env`, the `gsx version` probe) runs from the workspace folder, so mise/asdf shims and `GOTOOLCHAIN` resolve the project's versions; the probe timeout is raised from 3 s to 10 s for a slow shim at editor startup.
+- **Install/Update** runs from the workspace folder and, when `go.mod` requires `github.com/gsxhq/gsx`, installs that pinned version instead of `@latest`.
 - Attribute names follow gsx's widened HTML authoring rule: any character except whitespace, controls, `"`, `'`, `<`, `>`, `/`, `=`, `{`, `}` — so punctuation-led names like `.prop`, `?disabled`, `#ref`, `[a]`, `(b)`, `*ngIf`, `on:click|preventDefault`, `a&b`, `$x`, `!y`, and non-ASCII names are highlighted as attribute names (in `name="…"`, `name={…}`, bare, and `` name=f`…` ``/`` js`…` ``/`` css`…` `` forms, on elements and component tags) instead of being left uncolored.
 
 ## 0.0.11

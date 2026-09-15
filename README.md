@@ -22,6 +22,17 @@ Alternatively, when you open a `.gsx` file without `gsx` on your PATH the
 extension shows a one-click **"Install gsx"** prompt that runs the command for
 you.
 
+To pin gsx per project instead, declare it as a tool in your `go.mod`:
+
+```
+go get -tool github.com/gsxhq/gsx/cmd/gsx@latest
+```
+
+The extension then runs `go tool gsx lsp` from the workspace folder, so every
+contributor gets the version the project builds with and no separate install
+is needed. When `go.mod` requires `github.com/gsxhq/gsx`, **Install/Update**
+also drops `@latest` and installs that pinned version.
+
 ## Features
 
 - **Syntax highlighting** — tags, components, holes (`{ expr }`), embedded Go
@@ -36,21 +47,22 @@ you.
 
 | Setting | Default | Description |
 |---|---|---|
-| `gsx.server.path` | `""` | Absolute path to the `gsx` binary. Empty = auto-discover via `PATH`, `GOBIN`, `GOPATH/bin`. |
+| `gsx.server.path` | `""` | Path to the `gsx` binary. `${workspaceFolder}` and a leading `~` are expanded, and a relative path is resolved against the workspace folder, so a repo can commit a project-relative path. Empty = auto-discover via the `go.mod` `tool` directive, `PATH`, `GOBIN`, `GOPATH/bin`. |
 | `gsx.trace.server` | `"off"` | Trace LSP communication (`off` / `messages` / `verbose`). |
 
 ## Commands
 
 | Command | Description |
 |---|---|
-| `gsx: Install/Update Language Server` | Run `go install` to (re)install the `gsx` binary. |
+| `gsx: Install/Update Language Server` | Run `go install` from the workspace folder to (re)install the `gsx` binary (the `go.mod`-pinned version when the module is required, else `@latest`). |
 | `gsx: Restart Language Server` | Restart the `gsx lsp` process without reloading the window. |
 
 ## How it works
 
-When a `.gsx` file is opened the extension resolves the `gsx` binary (setting
-> `PATH` > `GOBIN` > `GOPATH/bin`) and launches `gsx lsp` as a stdio LSP
-server. All diagnostics, hover, go-to-definition, references, and formatting
+When a `.gsx` file is opened the extension resolves the `gsx` command (setting
+> `go tool gsx` if `go.mod` declares the tool > `PATH` > `GOBIN` > `GOPATH/bin`),
+running every probe from the workspace folder, and launches `gsx lsp` as a
+stdio LSP server from that folder. All diagnostics, hover, go-to-definition, references, and formatting
 responses come from that process. Syntax highlighting works independently of
 the binary via the bundled TextMate grammar.
 
