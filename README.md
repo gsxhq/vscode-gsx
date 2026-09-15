@@ -101,6 +101,15 @@ gh run watch "$(gh run list --workflow release.yml --limit 1 --json databaseId -
 
 Or from the GitHub UI: Actions → Release → Run workflow.
 
+If a marketplace upload fails after the tag and GitHub release were already
+created (the stores occasionally time out), do not re-run `Release` — it refuses
+to release an existing tag. Run the `Publish` workflow with that tag instead; it
+rebuilds the tag and uploads to both stores, skipping any that already have it:
+
+```bash
+gh workflow run publish.yml -f tag=v0.0.12
+```
+
 ## Links
 
 - Documentation: [gsxhq.github.io](https://gsxhq.github.io)

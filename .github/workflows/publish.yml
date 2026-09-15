@@ -1,0 +1,42 @@
+name: Publish
+
+# Re-publish an existing release tag to the marketplaces. The Release workflow
+# normally does this itself; use this one when a marketplace upload failed
+# after the tag was already pushed (e.g. a gallery timeout), since Release
+# refuses to run twice for the same version. The tag was gated by Release, so
+# this workflow only builds and uploads. Versions a store already has are
+# skipped, so re-running after a partial success is safe.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to publish, e.g. v0.0.12"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with: { ref: '${{ inputs.tag }}' }
+      - uses: actions/setup-node@v6
+        with: { node-version: 24 }
+      - run: npm ci
+      - name: Assert the tag matches package.json
+        run: |
+          v="$(node -p "require('./package.json').version")"
+          if [ "v$v" != "${{ inputs.tag }}" ]; then
+            echo "::error::tag ${{ inputs.tag }} checked out package.json version $v"
+            exit 1
+          fi
+      - name: Build for publish
+        run: npm run gen:grammar && npm run compile
+      - name: Publish to VS Code Marketplace
+        run: npx @vscode/vsce publish --skip-duplicate
+        env: { VSCE_PAT: '${{ secrets.VSCE_PAT }}' }
+      - name: Publish to Open VSX
+        run: npx ovsx publish --skip-duplicate
+        env: { OVSX_PAT: '${{ secrets.OVSX_PAT }}' }
