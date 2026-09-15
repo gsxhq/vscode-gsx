@@ -84,6 +84,9 @@ jobs:
       - name: Publish to VS Code Marketplace
         run: npx @vscode/vsce publish
         env: { VSCE_PAT: '${{ secrets.VSCE_PAT }}' }
+      # Runs even if the Marketplace step failed, so one store's outage does
+      # not block the other. The job still fails if either store fails.
       - name: Publish to Open VSX
+        if: ${{ !cancelled() }}
         run: npx ovsx publish
         env: { OVSX_PAT: '${{ secrets.OVSX_PAT }}' }
